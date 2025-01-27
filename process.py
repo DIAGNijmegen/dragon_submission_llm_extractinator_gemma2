@@ -269,7 +269,7 @@ class DragonSubmission(DragonBaseline):
             print_processing_message(task_id)
             try:
                 for example in data:
-                    example[self.task.target.prediction_name] = example.pop("label")
+                    example[self.task.target.prediction_name] = float(example.pop("label"))
                 data = drop_keys_except(data, ["uid", self.task.target.prediction_name])
             except KeyError:
                 print(f"Task {task_id} does not contain 'label' key.")
@@ -345,11 +345,11 @@ class DragonSubmission(DragonBaseline):
                     # # Go through the list of lesion sizes and fill it to a length of 5 with Nones
                     # example[self.task.target.prediction_name] = example[self.task.target.prediction_name] + [None] * (5 - len(example[self.task.target.prediction_name]))
                     example[self.task.target.prediction_name] = [
-                        example.pop("lesion_1"),
-                        example.pop("lesion_2"),
-                        example.pop("lesion_3"),
-                        example.pop("lesion_4"),
-                        example.pop("lesion_5"),
+                        float(example.pop("lesion_1")),
+                        float(example.pop("lesion_2")),
+                        float(example.pop("lesion_3")),
+                        float(example.pop("lesion_4")),
+                        float(example.pop("lesion_5")),
                     ]
                 data = drop_keys_except(data, ["uid", self.task.target.prediction_name])
             except KeyError:
