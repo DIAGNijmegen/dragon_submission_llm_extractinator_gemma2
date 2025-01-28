@@ -269,7 +269,9 @@ class DragonSubmission(DragonBaseline):
             print_processing_message(task_id)
             try:
                 for example in data:
-                    example[self.task.target.prediction_name] = float(example.pop("label"))
+                    example[self.task.target.prediction_name] = float(
+                        example.pop("label")
+                    )
                 data = drop_keys_except(data, ["uid", self.task.target.prediction_name])
             except KeyError:
                 print(f"Task {task_id} does not contain 'label' key.")
@@ -476,7 +478,11 @@ class DragonSubmission(DragonBaseline):
                         ner_target = [[] for _ in range(len(text_parts))]
 
                         # Regex pattern to validate biopsy quality literals
-                        valid_quality_literals = {"representatief", "niet representatief", "ambigu"}
+                        valid_quality_literals = {
+                            "representatief",
+                            "niet representatief",
+                            "ambigu",
+                        }
 
                         has_valid_biopsy = False
 
@@ -509,7 +515,9 @@ class DragonSubmission(DragonBaseline):
                                     ner_target[i].append(f"B-{number}-locatie naald")
                                     # Assign I-<ENTITY> to subsequent tokens
                                     for j in range(1, location_len):
-                                        ner_target[i + j].append(f"I-{number}-locatie naald")
+                                        ner_target[i + j].append(
+                                            f"I-{number}-locatie naald"
+                                        )
                                     break  # Stop after the first match for this location
 
                             # Tokenize the quality text
@@ -523,7 +531,9 @@ class DragonSubmission(DragonBaseline):
                                     ner_target[i].append(f"B-{number}-{quality}")
                                     # Assign I-<ENTITY> to subsequent tokens
                                     for j in range(1, quality_len):
-                                        ner_target[i + j].append(f"I-{number}-{quality}")
+                                        ner_target[i + j].append(
+                                            f"I-{number}-{quality}"
+                                        )
                                     break  # Stop after the first match for this quality
 
                         if not has_valid_biopsy:
@@ -531,11 +541,15 @@ class DragonSubmission(DragonBaseline):
                             ner_target = [["O"] for _ in range(len(text_parts))]
                         else:
                             # Ensure each token's tags are in the form of lists
-                            ner_target = [["O"] if not tags else tags for tags in ner_target]
+                            ner_target = [
+                                ["O"] if not tags else tags for tags in ner_target
+                            ]
 
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
-                        print(f"Error processing example with uid {example.get('uid', 'unknown')}: {e}")
+                        print(
+                            f"Error processing example with uid {example.get('uid', 'unknown')}: {e}"
+                        )
                 data = drop_keys_except(data, ["uid", self.task.target.prediction_name])
             except KeyError:
                 print(f"Task {task_id} does not contain the correct keys.")
@@ -562,7 +576,9 @@ class DragonSubmission(DragonBaseline):
                             case_number = case.get("case_number")
                             diagnosis = case.get("diagnosis", {})
                             subtypes = case.get("subtypes", [])
-                            tissue_acquisition_method = case.get("tissue_acquisition_method", {})
+                            tissue_acquisition_method = case.get(
+                                "tissue_acquisition_method", {}
+                            )
 
                             if not case_number:
                                 continue  # Skip if case_number is missing
@@ -576,10 +592,17 @@ class DragonSubmission(DragonBaseline):
                                 diagnosis_len = len(diagnosis_tokens)
 
                                 for i in range(len(text_parts) - diagnosis_len + 1):
-                                    if text_parts[i : i + diagnosis_len] == diagnosis_tokens:
-                                        ner_target[i].append(f"B-{case_number}-{diagnosis_type}")
+                                    if (
+                                        text_parts[i : i + diagnosis_len]
+                                        == diagnosis_tokens
+                                    ):
+                                        ner_target[i].append(
+                                            f"B-{case_number}-{diagnosis_type}"
+                                        )
                                         for j in range(1, diagnosis_len):
-                                            ner_target[i + j].append(f"I-{case_number}-{diagnosis_type}")
+                                            ner_target[i + j].append(
+                                                f"I-{case_number}-{diagnosis_type}"
+                                            )
                                         break
 
                             # Process subtypes
@@ -592,10 +615,17 @@ class DragonSubmission(DragonBaseline):
                                     subtype_len = len(subtype_tokens)
 
                                     for i in range(len(text_parts) - subtype_len + 1):
-                                        if text_parts[i : i + subtype_len] == subtype_tokens:
-                                            ner_target[i].append(f"B-{case_number}-{subtype_type}")
+                                        if (
+                                            text_parts[i : i + subtype_len]
+                                            == subtype_tokens
+                                        ):
+                                            ner_target[i].append(
+                                                f"B-{case_number}-{subtype_type}"
+                                            )
                                             for j in range(1, subtype_len):
-                                                ner_target[i + j].append(f"I-{case_number}-{subtype_type}")
+                                                ner_target[i + j].append(
+                                                    f"I-{case_number}-{subtype_type}"
+                                                )
                                             break
 
                             # Process tissue acquisition method
@@ -608,9 +638,13 @@ class DragonSubmission(DragonBaseline):
 
                                 for i in range(len(text_parts) - tissue_len + 1):
                                     if text_parts[i : i + tissue_len] == tissue_tokens:
-                                        ner_target[i].append(f"B-{case_number}-{tissue_type}")
+                                        ner_target[i].append(
+                                            f"B-{case_number}-{tissue_type}"
+                                        )
                                         for j in range(1, tissue_len):
-                                            ner_target[i + j].append(f"I-{case_number}-{tissue_type}")
+                                            ner_target[i + j].append(
+                                                f"I-{case_number}-{tissue_type}"
+                                            )
                                         break
 
                         if not has_valid_case:
@@ -618,11 +652,15 @@ class DragonSubmission(DragonBaseline):
                             ner_target = [["O"] for _ in range(len(text_parts))]
                         else:
                             # Ensure each token's tags are in the form of lists
-                            ner_target = [["O"] if not tags else tags for tags in ner_target]
+                            ner_target = [
+                                ["O"] if not tags else tags for tags in ner_target
+                            ]
 
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
-                        print(f"Error processing example with uid {example.get('uid', 'unknown')}: {e}")
+                        print(
+                            f"Error processing example with uid {example.get('uid', 'unknown')}: {e}"
+                        )
                 data = drop_keys_except(data, ["uid", self.task.target.prediction_name])
             except KeyError:
                 print(f"Task {task_id} does not contain the correct keys.")
