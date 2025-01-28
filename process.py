@@ -107,6 +107,43 @@ class DragonSubmission(DragonBaseline):
                 self.df_test
             )
 
+    def remove_common_prefix_from_reports(self):
+        """Remove the common prefix from the reports."""
+        # find the common prefix
+        if self.task.input_name == "text":
+            reports = self.df_train[self.task.input_name].to_list()
+            self.common_prefix = self.longest_common_prefix(reports)
+
+            if not self.common_prefix:
+                return
+
+            # remove the common prefix
+            print(f"Removing common prefix from all reports: {self.common_prefix}")
+            for df in [self.df_train, self.df_val, self.df_test]:
+                df[self.task.input_name] = df[self.task.input_name].apply(
+                    lambda x: re.sub(f"^{self.common_prefix}", "", x)
+                )
+        elif self.task.input_name == "text_parts":
+            reports = self.df_train[self.task.input_name].to_list()
+            self.common_prefix = self.longest_common_prefix_tokenized(reports)
+
+            if not self.common_prefix:
+                return
+
+            # remove the common prefix
+            print(f"Removing common prefix from all reports: {self.common_prefix}")
+            for df in [self.df_train, self.df_val, self.df_test]:
+                df[self.task.input_name] = df[self.task.input_name].apply(
+                    lambda x: x[len(self.common_prefix) :]
+                )
+
+                df["length_common_prefix"] = len(self.common_prefix)
+
+                if self.task.target.label_name in df.columns:
+                    df[self.task.target.label_name] = df[
+                        self.task.target.label_name
+                    ].apply(lambda x: x[len(self.common_prefix) :])
+
     def process(self):
         """
         Override the process method to use llm_extractinator for predictions.
@@ -154,7 +191,7 @@ class DragonSubmission(DragonBaseline):
 
         extractinate(
             task_id=self.task_id,
-            model_name="phi4",
+            model_name="gemma2",
             num_examples=0,
             max_context_len=8192,
             num_predict=512,
@@ -363,7 +400,7 @@ class DragonSubmission(DragonBaseline):
             try:
                 for example in data:
                     try:
-                        text_parts = example.pop("text_parts")
+                        text_parts = example.get("text_parts")
                         anonymized_text = example.pop("anonymized_text")
 
                         # Initialize ner_target with 'O' for all tokens
@@ -409,6 +446,12 @@ class DragonSubmission(DragonBaseline):
                             # If no valid tuples were found, set ner_target to all "O"
                             ner_target = ["O"] * len(text_parts)
 
+                        if "length_common_prefix" in example:
+                            # Add the length of the common prefix * ["O"] to the beginning of the ner_target
+                            ner_target = ["O"] * example[
+                                "length_common_prefix"
+                            ] + ner_target
+
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
                         print(
@@ -424,8 +467,8 @@ class DragonSubmission(DragonBaseline):
             try:
                 for example in data:
                     try:
-                        text_parts = example.pop("text_parts")
-                        medical_entities = example.pop("medical_entities")
+                        text_parts = example.get("text_parts")
+                        medical_entities = example.pop("medical_terminology_entities")
 
                         # Initialize ner_target with 'O' for all tokens
                         ner_target = ["O"] * len(text_parts)
@@ -456,6 +499,12 @@ class DragonSubmission(DragonBaseline):
                             # If no valid entities were found, set ner_target to all "O"
                             ner_target = ["O"] * len(text_parts)
 
+                        if "length_common_prefix" in example:
+                            # Add the length of the common prefix * ["O"] to the beginning of the ner_target
+                            ner_target = ["O"] * example[
+                                "length_common_prefix"
+                            ] + ner_target
+
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
                         print(
@@ -471,7 +520,7 @@ class DragonSubmission(DragonBaseline):
             try:
                 for example in data:
                     try:
-                        text_parts = example.pop("text_parts")
+                        text_parts = example.get("text_parts")
                         biopsies = example.pop("biopsies", [])
 
                         # Initialize ner_target with lists for overlapping tags
@@ -545,6 +594,12 @@ class DragonSubmission(DragonBaseline):
                                 ["O"] if not tags else tags for tags in ner_target
                             ]
 
+                        if "length_common_prefix" in example:
+                            # Add the length of the common prefix * ["O"] to the beginning of the ner_target
+                            ner_target = [["O"]] * example[
+                                "length_common_prefix"
+                            ] + ner_target
+
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
                         print(
@@ -560,7 +615,7 @@ class DragonSubmission(DragonBaseline):
             try:
                 for example in data:
                     try:
-                        text_parts = example.pop("text_parts")
+                        text_parts = example.get("text_parts")
                         cases = example.pop("cases", [])
 
                         # Initialize ner_target with lists for overlapping tags
@@ -655,6 +710,12 @@ class DragonSubmission(DragonBaseline):
                             ner_target = [
                                 ["O"] if not tags else tags for tags in ner_target
                             ]
+
+                        if "length_common_prefix" in example:
+                            # Add the length of the common prefix * ["O"] to the beginning of the ner_target
+                            ner_target = [["O"]] * example[
+                                "length_common_prefix"
+                            ] + ner_target
 
                         example[self.task.target.prediction_name] = ner_target
                     except Exception as e:
