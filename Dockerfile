@@ -23,7 +23,6 @@ RUN python -m pip install --user -r requirements.txt
 
 # Move the model weights to the right folder
 # COPY --chown=user models /opt/ml/model/
-# ENV OLLAMA_MODELS=/opt/app/models
 ENV OLLAMA_MODELS=/opt/ml/model/
 
 # Download the model, tokenizer and metrics
