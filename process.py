@@ -191,10 +191,10 @@ class DragonSubmission(DragonBaseline):
 
         extractinate(
             task_id=self.task_id,
-            model_name="deepseek-r1:1.5b",
+            model_name="gemma2",
             num_examples=0,
             max_context_len="split",
-            num_predict=1024,
+            num_predict=512,
             translate=False,
             data_dir=self.basepath / "data",
             output_dir=self.basepath / "output",
@@ -202,7 +202,7 @@ class DragonSubmission(DragonBaseline):
             n_runs=1,
             verbose=False,
             run_name="run",
-            reasoning_model=True,
+            reasoning_model=False,
         )
 
     def postprocess(self):
