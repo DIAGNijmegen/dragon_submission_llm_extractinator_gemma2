@@ -1,5 +1,6 @@
 import json
 import re
+import signal
 import time
 from pathlib import Path
 from typing import List, Union
@@ -148,22 +149,32 @@ class DragonSubmission(DragonBaseline):
         """
         Override the process method to use llm_extractinator for predictions.
         """
-        print("Loading data...")
-        self.load()
-        print("Validating data...")
-        self.validate()
-        print("Analyzing data...")
-        self.analyze()
-        print("Preprocessing data...")
-        self.preprocess()
-        print("Setting up folder structure...")
-        self.setup_folder_structure()
-        print("Extracting predictions...")
-        self.extract_predictions()
-        print("Postprocessing predictions...")
-        self.postprocess()
-        print("Validating predictions...")
-        self.verify_predictions()
+
+        def timeout_handler(signum, frame):
+            raise TimeoutError("The process exceeded 1 hour and was terminated.")
+
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(3600)
+
+        try:
+            print("Loading data...")
+            self.load()
+            print("Validating data...")
+            self.validate()
+            print("Analyzing data...")
+            self.analyze()
+            print("Preprocessing data...")
+            self.preprocess()
+            print("Setting up folder structure...")
+            self.setup_folder_structure()
+            print("Extracting predictions...")
+            self.extract_predictions()
+            print("Postprocessing predictions...")
+            self.postprocess()
+            print("Validating predictions...")
+            self.verify_predictions()
+        finally:
+            signal.alarm(0)
 
     def setup_folder_structure(self):
         """
@@ -193,6 +204,7 @@ class DragonSubmission(DragonBaseline):
             task_id=self.task_id,
             model_name="gemma2",
             num_examples=0,
+            temperature=0.0,
             max_context_len="split",
             num_predict=512,
             translate=False,
@@ -203,6 +215,7 @@ class DragonSubmission(DragonBaseline):
             verbose=False,
             run_name="run",
             reasoning_model=False,
+            seed=42,
         )
 
     def postprocess(self):
