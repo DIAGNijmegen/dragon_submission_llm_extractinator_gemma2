@@ -1,0 +1,9 @@
+# Convert all text files to Unix-style endings
+* text=auto
+
+# Explicitly set specific file types
+*.sh text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
