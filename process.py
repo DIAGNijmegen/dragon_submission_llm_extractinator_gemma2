@@ -154,7 +154,7 @@ class DragonSubmission(DragonBaseline):
             raise TimeoutError("The process exceeded 1 hour and was terminated.")
 
         signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(3600)
+        signal.alarm(3300)
 
         try:
             print("Loading data...")
