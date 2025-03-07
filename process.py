@@ -168,12 +168,12 @@ class DragonSubmission(DragonBaseline):
         print("Validating predictions...")
         self.verify_predictions()
 
-    def process_with_timeout(timeout_seconds=3300):
+    def process_with_timeout(self, timeout_seconds=3300):
         """
         Runs the DragonSubmission.process() method with a timeout.
         Uses multiprocessing to enforce the timeout.
         """
-        process = multiprocessing.Process(target=DragonSubmission().process)
+        process = multiprocessing.Process(target=self.process)
         process.start()
         process.join(timeout_seconds)
 
