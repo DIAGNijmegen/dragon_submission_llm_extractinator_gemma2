@@ -1,4 +1,5 @@
 import evaluate
+import tiktoken
 
 if __name__ == "__main__":
     # cache metrics
@@ -6,4 +7,4 @@ if __name__ == "__main__":
     evaluate.load("mse")
     evaluate.load("f1")
     evaluate.load("seqeval")
-
+    encoding = tiktoken.get_encoding("cl100k_base")
