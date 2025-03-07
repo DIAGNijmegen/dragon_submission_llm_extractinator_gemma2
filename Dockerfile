@@ -7,8 +7,7 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 RUN groupadd -r user && useradd -m --no-log-init -r -g user user
 
-RUN mkdir -p /opt/app /input /output \
-    && chown user:user /opt/app /input /output
+RUN mkdir -p /opt/app /input /output && chown user:user /opt/app /input /output
 
 USER user
 WORKDIR /opt/app
