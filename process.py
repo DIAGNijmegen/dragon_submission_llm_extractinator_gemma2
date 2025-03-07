@@ -1,6 +1,8 @@
 import json
+import multiprocessing
 import re
 import signal
+import sys
 import time
 from pathlib import Path
 from typing import List, Union
@@ -149,32 +151,39 @@ class DragonSubmission(DragonBaseline):
         """
         Override the process method to use llm_extractinator for predictions.
         """
+        print("Loading data...")
+        self.load()
+        print("Validating data...")
+        self.validate()
+        print("Analyzing data...")
+        self.analyze()
+        print("Preprocessing data...")
+        self.preprocess()
+        print("Setting up folder structure...")
+        self.setup_folder_structure()
+        print("Extracting predictions...")
+        self.extract_predictions()
+        print("Postprocessing predictions...")
+        self.postprocess()
+        print("Validating predictions...")
+        self.verify_predictions()
 
-        def timeout_handler(signum, frame):
-            raise TimeoutError("The process exceeded 1 hour and was terminated.")
+    def process_with_timeout(timeout_seconds=3300):
+        """
+        Runs the DragonSubmission.process() method with a timeout.
+        Uses multiprocessing to enforce the timeout.
+        """
+        process = multiprocessing.Process(target=DragonSubmission().process)
+        process.start()
+        process.join(timeout_seconds)
 
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(3300)
-
-        try:
-            print("Loading data...")
-            self.load()
-            print("Validating data...")
-            self.validate()
-            print("Analyzing data...")
-            self.analyze()
-            print("Preprocessing data...")
-            self.preprocess()
-            print("Setting up folder structure...")
-            self.setup_folder_structure()
-            print("Extracting predictions...")
-            self.extract_predictions()
-            print("Postprocessing predictions...")
-            self.postprocess()
-            print("Validating predictions...")
-            self.verify_predictions()
-        finally:
-            signal.alarm(0)
+        if process.is_alive():
+            print(
+                f"Timeout exceeded ({timeout_seconds} seconds). Terminating process..."
+            )
+            process.terminate()
+            process.join()
+            sys.exit(1)
 
     def setup_folder_structure(self):
         """
@@ -919,4 +928,4 @@ class DragonSubmission(DragonBaseline):
 
 
 if __name__ == "__main__":
-    DragonSubmission().process()
+    DragonSubmission().process_with_timeout()
