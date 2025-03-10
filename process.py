@@ -151,6 +151,13 @@ class DragonSubmission(DragonBaseline):
         """
         Override the process method to use llm_extractinator for predictions.
         """
+        import tiktoken
+
+        print("Checking tiktoken...")
+        encoding = tiktoken.get_encoding("cl100k_base")
+        encoding.encode("Hello, world")
+        print("Tiktoken is working!")
+
         print("Loading data...")
         self.load()
         print("Validating data...")

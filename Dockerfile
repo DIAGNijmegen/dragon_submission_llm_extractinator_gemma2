@@ -41,4 +41,7 @@ ENV HF_DATASETS_OFFLINE=1
 # Copy the algorithm code
 COPY --chown=user:user process.py /opt/app/
 
+# Cache tiktoken
+RUN python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
+
 ENTRYPOINT [ "python", "-m", "process" ]
