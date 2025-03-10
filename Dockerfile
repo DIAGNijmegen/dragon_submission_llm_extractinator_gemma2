@@ -7,7 +7,7 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 RUN groupadd -r user && useradd -m --no-log-init -r -g user user
 
-RUN mkdir -p /opt/app /input /output && chown user:user /opt/app /input /output
+RUN mkdir -p /opt/app /opt/tiktoken_cache /input /output && chown user:user /opt/app /input /output
 
 USER user
 WORKDIR /opt/app
@@ -45,7 +45,6 @@ COPY --chown=user:user process.py /opt/app/
 # COPY --chown=user:user tiktoken/6bac041639f96ec8dfd77f9156d953f52fa49279 /opt/tiktoken_cache/
 # ENV TIKTOKEN_CACHE_DIR=/opt/tiktoken_cache
 RUN pip install --upgrade tiktoken
-RUN mkdir /opt/tiktoken_cache
 ARG TIKTOKEN_URL="https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken"
 RUN wget -O /opt/tiktoken_cache/$(echo -n $TIKTOKEN_URL | sha1sum | head -c 40) $TIKTOKEN_URL
 
