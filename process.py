@@ -151,7 +151,12 @@ class DragonSubmission(DragonBaseline):
         """
         Override the process method to use llm_extractinator for predictions.
         """
+        import os
+
         import tiktoken
+
+        tiktoken_cache_dir = "/opt/tiktoken_cache"
+        os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
 
         print("Checking tiktoken...")
         encoding = tiktoken.get_encoding("cl100k_base")
