@@ -1,8 +1,6 @@
 FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 
-RUN apt-get update 
-RUN apt-get install -y curl 
-RUN apt-get install -y wget
+RUN apt-get update && apt-get install -y curl wget
 
 # Install Ollama
 RUN curl -fsSL https://ollama.com/install.sh | sh
@@ -49,7 +47,5 @@ COPY --chown=user:user process.py /opt/app/
 RUN pip install --upgrade tiktoken
 ARG TIKTOKEN_URL="https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken"
 RUN wget -O /opt/tiktoken_cache/$(echo -n $TIKTOKEN_URL | sha1sum | head -c 40) $TIKTOKEN_URL
-
-ENV TIKTOKEN_CACHE_DIR=/opt/tiktoken_cache
 
 ENTRYPOINT [ "python", "-m", "process" ]
