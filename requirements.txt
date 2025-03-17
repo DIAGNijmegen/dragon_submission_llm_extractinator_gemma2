@@ -192,7 +192,7 @@ langsmith==0.3.8
     # via
     #   langchain
     #   langchain-core
-llm-extractinator==0.4.1
+llm-extractinator==0.4.2
     # via -r requirements.in
 markdown-it-py==3.0.0
     # via rich
